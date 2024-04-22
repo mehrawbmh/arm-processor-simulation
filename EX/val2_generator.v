@@ -27,7 +27,7 @@ module val2_generator(
 
     always @(*) begin
         if (load_store_cmd)
-            val2 = shift_operand[11] ? {20(1'b1), shift_operand} : {20'd0, shift_operand};
+            val2 = shift_operand[11] ? {20'b1, shift_operand} : {20'd0, shift_operand};
         else 
             val2 = tmp_shifted;
     end

@@ -17,12 +17,11 @@ module EX_Stage (
     wire [31:0] val2;
     
     wire imm32;
-    assign imm32 = sigend_imm_24[23] ? {8(1'b1), shift_operand} : {8'd0, shift_operand}
+    assign imm32 = sigend_imm_24[23] ? {8'b1, shift_operand} : {8'd0, shift_operand};
 
-    val2_generator valGen(val_rm, imm,shift_operand,mem_R_en, mem_W_en, output reg [31:0] val2);
+    val2_generator valGen(val_rm, imm,shift_operand,mem_R_en, mem_W_en, val2);
     ALU alu (val_rn, val2, status_reg[1],exe_command, alu_result);
 
     assign br_addr = pc + imm32;
-);
 
 endmodule

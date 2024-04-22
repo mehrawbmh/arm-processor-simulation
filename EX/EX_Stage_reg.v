@@ -5,7 +5,7 @@ module ex_stage_reg(
     input mem_r_en_in,
     input mem_w_en_in,
     input [3:0] dest_in,
-    input [31:0] alu_result_in, st_val_in
+    input [31:0] alu_result_in, st_val_in,
     output reg wb_en_out, mem_r_en_out, mem_w_en_out,
     output reg [31:0] alu_result_out, st_val_out,
     output reg [3:0] dest_out
