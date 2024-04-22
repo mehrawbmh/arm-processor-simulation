@@ -4,13 +4,13 @@ module MA_stage(
     output[31:0] mem_result);
 
     reg [31:0] memory [0:63];
-    wire [31:0] true_addr=(addresss-31'd1024)>>2;
+    wire [31:0] true_addr=(addresss-32'd1024)>>2;
     always@(posedge clk)begin
 
         if(mem_w_en)begin
             memory[true_addr] <= data;
         end
-        mem_result=(mem_r_en)?memory[true_addr] :32'b0;
+        
     end
-
+    assign mem_result=(mem_r_en)?memory[true_addr] :32'b0;
 endmodule
