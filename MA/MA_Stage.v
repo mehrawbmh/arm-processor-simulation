@@ -1,8 +1,16 @@
-module MA_Stage (
-    input clk,
-    input rst,
-    input [31:0] pcIn,
-    output [31:0] pcOut
-);
-    assign pcOut = pcIn;
+module MA_stage(
+    input clk,mem_r_en, mem_w_en,
+    input [31:0] addresss,data
+    output[31:0] mem_result);
+
+    reg [31:0] memory [0:63];
+    wire [31:0] true_addr=(addresss-31'd1024)>>2;
+    always@(posedge clk)begin
+
+        if(mem_w_en)begin
+            memory[true_addr] <= data;
+        end
+        mem_result=(mem_r_en)?memory[true_addr] :32'b0;
+    end
+
 endmodule
