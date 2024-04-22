@@ -305,32 +305,32 @@ inout	[35:0]	GPIO_1;					//	GPIO Connection 1
 
 // IF wires
 wire [31:0] pc,instruction,IFR_pc_out,IFR_instruction_out;
-wire  freeze,branch_taken;
-wire [31:0] branch_addr;
+wire IDR_B_out, freeze;
+wire [31:0] Branch_addr;
 
 wire clk,rst;
 assign clk=CLOCK_50;
 assign rst=SW[0];
+
 assign freeze=1'b0;
 assign flush=1'b0;
-assign branch_taken=1'b0;
+
 
 /// IF
-IF_Stage aa(clk,rst,freeze,branch_taken,branch_addr,pc,instruction);
-IF_Stage_reg bb(clk,rst,freeze,flush,pc,instruction,IFR_pc_out,IFR_instruction_out);
+IF_Stage if_stage(clk,rst,freeze,IDR_B_out,Branch_addr,pc,instruction);
+IF_Stage_reg if_stage_register(clk,rst,freeze,flush,pc,instruction,IFR_pc_out,IFR_instruction_out);
 
 // ID wires
 // inputs
-wire [31:0] Result_WB,dest_wb;
+wire [31:0] Result_WB;
 wire writeBackEn,hazard;
-wire [3:0] SR;
+wire [3:0] SR, dest_wb;
 
 
-assign writeBackEn=1'b0;
 assign Result_WB=32'b0;
-assign dest_wb=32'b0;
-assign SR=4'b0;
+assign dest_wb=4'b0;
 assign hazard=1'b0;
+assign writeBackEn = 1'b0;
 
 //outputs
 wire wb_en,mem_r_en,mem_w_en,B,S,imm,Two_src;
@@ -340,20 +340,72 @@ wire [11:0] shift_operand;
 wire [23:0] signed_imm_24;
 wire [3:0] src1,src2;
 
-wire IDR_wb_en_out,IDR_mem_r_en_out,IDR_mem_w_en_out,IDR_B_out,IDR_S_out,IDR_imm_out;
+wire IDR_wb_en_out,IDR_mem_r_en_out,IDR_mem_w_en_out,IDR_S_out,IDR_imm_out;
 wire [31:0] IDR_PC_out,IDR_Val_Rn_out,IDR_Val_Rm_out;
-wire [3:0] IDR_exe_cmd_out,IDR_Dest_out;
+wire [3:0] IDR_exe_cmd_out,IDR_Dest_out, IDR_SR_out;
 wire [11:0] IDR_shift_operand_out;
 wire [23:0] IDR_signed_imm_24_out;
 // ID
 
-ID_Stage cc(clk,rst,IFR_instruction_out,Result_WB,writeBackEn,dest_wb,hazard,
-SR,wb_en,mem_r_en,mem_w_en,B,S,exe_cmd,Val_Rn, Val_Rm,imm,shift_operand,signed_imm_24,Dest,
-src1,src2,Two_src);
+ID_Stage id_stage(
+	clk,rst,IFR_instruction_out,Result_WB,writeBackEn,dest_wb,hazard,
+	SR,wb_en,mem_r_en,mem_w_en,B,S,exe_cmd,Val_Rn, Val_Rm,imm,shift_operand,signed_imm_24,Dest,
+	src1,src2,Two_src
+);
 
-ID_stage_reg dd(clk,rst,flush,wb_en,mem_r_en,mem_w_en,B,S,IFR_pc_out,exe_cmd,Val_Rn, Val_Rm,
-imm,shift_operand,signed_imm_24,Dest,IDR_wb_en_out,IDR_mem_r_en_out,IDR_mem_w_en_out,
-IDR_B_out,IDR_S_out,IDR_PC_out,IDR_exe_cmd_out,IDR_Val_Rn_out,IDR_Val_Rm_out,
-IDR_imm_out,IDR_shift_operand_out,IDR_signed_imm_24_out,IDR_Dest_out);
+ID_stage_reg id_stage_register(
+	clk,rst,flush,wb_en,mem_r_en,mem_w_en,B,S,IFR_pc_out,exe_cmd,Val_Rn, Val_Rm,
+	imm,shift_operand,signed_imm_24,Dest,SR,IDR_wb_en_out,IDR_mem_r_en_out,IDR_mem_w_en_out,
+	IDR_B_out,IDR_S_out,IDR_PC_out,IDR_exe_cmd_out,IDR_Val_Rn_out,IDR_Val_Rm_out,
+	IDR_imm_out,IDR_shift_operand_out,IDR_signed_imm_24_out,IDR_Dest_out, IDR_SR_out
+);
+
+
+//EXE
+wire [3:0] EX_status_out, ALU_status_out;
+wire [31:0] ALU_result;
+
+status_reg st_reg(clk, rst, IDR_S_out, ALU_status_out, SR);
+
+EX_Stage ex_stage (
+    clk,
+    rst,
+    IDR_exe_cmd_out,
+    IDR_mem_r_en_out,
+    IDR_mem_w_en_out,
+    IDR_PC_out,
+    IDR_Val_Rn_out,
+    IDR_Val_Rm_out,
+    IDR_imm_out,
+    IDR_shift_operand_out,
+    IDR_signed_imm_24_out,
+    IDR_SR_out,
+    ALU_result,
+    Branch_addr,
+    ALU_status_out
+);
+
+wire EXR_wb_en_out;
+wire EXR_mem_r_en_out;
+wire EXR_mem_w_en_out;
+wire [31:0] EXR_ALU_result_out, EXR_ST_val_out;
+wire [3:0] EXR_dest_out;
+
+ex_stage_reg EX_stage_register(
+    clk,
+    rst,
+    IDR_wb_en_out,
+    IDR_mem_r_en_out,
+    IDR_mem_w_en_out,
+    IDR_Dest_out,
+    ALU_result,
+    IDR_Val_Rm_out,
+    EXR_wb_en_out,
+    EXR_mem_r_en_out,
+    EXR_mem_w_en_out,
+    EXR_ALU_result_out,
+    EXR_ST_val_out,
+    EXR_dest_out
+);
 
 endmodule
