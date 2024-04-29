@@ -9,10 +9,10 @@ module MA_Stage_reg(
     
     always@(posedge clk, negedge rst)begin
         if(rst)begin
-        WB_en <= 1'b0;
-        MEM_R_en <= 1'b0;
-        ALU_result <= 32'b0;
-        Mem_read_value <= 32'b0;
+        wb_en <= 1'b0;
+        mem_r_en <= 1'b0;
+        alu_result <= 32'b0;
+        mem_read_value <= 32'b0;
         Dest <= 4'b0;
     end
 	 else begin

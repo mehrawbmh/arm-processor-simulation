@@ -1,6 +1,6 @@
 module MA_stage(
     input clk,mem_r_en, mem_w_en,
-    input [31:0] addresss,data
+    input [31:0] addresss,data,
     output[31:0] mem_result);
 
     reg [31:0] memory [0:63];
