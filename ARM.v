@@ -1,4 +1,4 @@
-// ============================================================================
+	// ============================================================================
 // Copyright (c) 2012 by Terasic Technologies Inc.
 // ============================================================================
 //
@@ -312,25 +312,24 @@ wire clk,rst;
 assign clk=CLOCK_50;
 assign rst=SW[0];
 
-assign freeze=1'b0;
-assign flush=1'b0;
 
+
+wire hazard_Detected;
 
 /// IF
-IF_Stage if_stage(clk,rst,freeze,IDR_B_out,Branch_addr,pc,instruction);
-IF_Stage_reg if_stage_register(clk,rst,freeze,flush,pc,instruction,IFR_pc_out,IFR_instruction_out);
+IF_Stage if_stage(clk,rst,hazard_Detected,IDR_B_out,Branch_addr,pc,instruction);
+IF_Stage_reg if_stage_register(clk,rst,hazard_Detected,IDR_B_out,pc,instruction,IFR_pc_out,IFR_instruction_out);
 
 // ID wires
 // inputs
-wire [31:0] Result_WB;
-wire writeBackEn,hazard;
-wire [3:0] SR, dest_wb;
+
+wire [3:0] SR;
 
 
-assign Result_WB=32'b0;
-assign dest_wb=4'b0;
-assign hazard=1'b0;
-assign writeBackEn = 1'b0;
+
+
+
+
 
 //outputs
 wire wb_en,mem_r_en,mem_w_en,B,S,imm,Two_src;
@@ -341,20 +340,26 @@ wire [23:0] signed_imm_24;
 wire [3:0] src1,src2;
 
 wire IDR_wb_en_out,IDR_mem_r_en_out,IDR_mem_w_en_out,IDR_S_out,IDR_imm_out;
+
 wire [31:0] IDR_PC_out,IDR_Val_Rn_out,IDR_Val_Rm_out;
 wire [3:0] IDR_exe_cmd_out,IDR_Dest_out, IDR_SR_out;
 wire [11:0] IDR_shift_operand_out;
 wire [23:0] IDR_signed_imm_24_out;
+
+wire [31:0] WB_value;
+wire WBR_wb_en_out;
+
+wire [3:0]  WBR_Dest_out;
 // ID
 
 ID_Stage id_stage(
-	clk,rst,IFR_instruction_out,Result_WB,writeBackEn,dest_wb,hazard,
+	clk,rst,IFR_instruction_out,WB_value,WBR_wb_en_out,WBR_Dest_out,hazard_Detected,
 	SR,wb_en,mem_r_en,mem_w_en,B,S,exe_cmd,Val_Rn, Val_Rm,imm,shift_operand,signed_imm_24,Dest,
 	src1,src2,Two_src
 );
 
 ID_stage_reg id_stage_register(
-	clk,rst,flush,wb_en,mem_r_en,mem_w_en,B,S,IFR_pc_out,exe_cmd,Val_Rn, Val_Rm,
+	clk,rst,IDR_B_out,wb_en,mem_r_en,mem_w_en,B,S,IFR_pc_out,exe_cmd,Val_Rn, Val_Rm,
 	imm,shift_operand,signed_imm_24,Dest,SR,IDR_wb_en_out,IDR_mem_r_en_out,IDR_mem_w_en_out,
 	IDR_B_out,IDR_S_out,IDR_PC_out,IDR_exe_cmd_out,IDR_Val_Rn_out,IDR_Val_Rm_out,
 	IDR_imm_out,IDR_shift_operand_out,IDR_signed_imm_24_out,IDR_Dest_out, IDR_SR_out
@@ -407,5 +412,56 @@ ex_stage_reg EX_stage_register(
     EXR_ST_val_out,
     EXR_dest_out
 );
+
+
+
+// MA
+
+// wires
+
+wire [31:0] mem_result,WBR_ALU_result_out,WBR_mem_read_value_out;
+wire WBR_mem_r_en_out;
+
+MA_stage ma_stage(
+	clk,EXR_mem_r_en_out,EXR_mem_w_en_out,
+	EXR_ST_val_out,EXR_ALU_result_out,
+	mem_result
+);
+
+MA_Stage_reg ma_stage_reg (
+	clk,rst,EXR_wb_en_out,EXR_mem_r_en_out,
+	EXR_ALU_result_out,mem_result,
+	EXR_dest_out,
+	WBR_wb_en_out,WBR_mem_r_en_out,
+	WBR_ALU_result_out,WBR_mem_read_value_out,
+	WBR_Dest_out
+);
+
+// WB
+// wires
+
+
+WB_Stage wb_stage(
+	WBR_ALU_result_out,WBR_mem_read_value_out,
+	WBR_mem_r_en_out,
+	WB_value
+);
+
+
+
+// hazard unit
+
+ID_hazard_detection_unit hazard_unit(
+	src1,
+	src2,
+	IDR_Dest_out,
+	IDR_wb_en_out,
+	EXR_dest_out,
+	EXR_wb_en_out,
+	Two_src,
+	hazard_Detected
+);
+
+
 
 endmodule

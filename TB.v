@@ -139,7 +139,7 @@ ARM A1(
         CLOCK_50 = 1'b0;
         SW[0] = 1'b1;
         #20 SW[0] = 1'b0;
-        #400 $stop;
+        #4000 $stop;
 
     end
 
