@@ -16,7 +16,7 @@ module val2_generator(
     assign immed_8 = shift_operand[7:0];
 
     wire [31:0] immed_32;
-    assign immed_32 = imm ? {24'd0, immed_8} : val_rm;
+    assign immed_32 = {24'd0, immed_8};
 
     wire [63:0] tmp, tmp2;
     assign tmp = {immed_32, immed_32};
@@ -24,12 +24,28 @@ module val2_generator(
 
     wire [31:0] tmp_shifted;
     assign tmp_shifted = tmp2[31:0];
+	
+	wire shift_case;
+	assign shift_case = shift_operand[6:5];
+	
+	wire [63:0] rotate_right;
+	assign rotate_right = {val_rm, val_rm} >> rotate_imm;
 
     always @(*) begin
         if (load_store_cmd)
             val2 = shift_operand[11] ? {20'b1, shift_operand} : {20'd0, shift_operand};
-        else 
+        else if (imm)
             val2 = tmp_shifted;
+		else begin
+			case (shift_case)
+				2'b00: val2 = val_rm << rotate_imm;
+				2'b01: val2 = val_rm >> rotate_imm;
+				2'b10: val2 = val_rm >>> rotate_imm;
+				2'b11: val2 = rotate_right[31:0];
+				default:
+					val2 = 32'dx;
+			endcase
+		end
     end
 
 
