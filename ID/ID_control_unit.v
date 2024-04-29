@@ -30,7 +30,7 @@ module ID_control_Unit (
                         end
                         else begin  //str
                             wb_en=1'b0;
-                            mem_r_en=1'b1;
+                            mem_w_en=1'b1;
                         end
 
                     end
