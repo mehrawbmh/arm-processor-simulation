@@ -23,7 +23,7 @@ module ALU (
             4'b0110: result = val1 & val2;
             4'b0111: result = val1 | val2;
             4'b1000: result = val1 ^ val2;
-            default: result = 32'dx;
+            default: result = 32'd0;
         endcase
     end
 
