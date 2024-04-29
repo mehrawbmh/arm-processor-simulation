@@ -8,13 +8,16 @@ module ALU (
 );
 
     assign carry_bar = !carry;
+	
+	reg cout;
 
     always @(*) begin
+		cout = 1'b0;
         case (exe_command)
             4'b0001: result = val2;
             4'b1001: result = ~val2;
-            4'b0010: result = val1 + val2;
-            4'b0011: result = val1 + val2 + carry;
+            4'b0010: {cout, result} = val1 + val2;
+            4'b0011: {cout, result} = val1 + val2 + carry;
             4'b0100: result = val1 - val2;
             4'b0101: result = val1 - val2 - carry_bar;
             4'b0110: result = val1 & val2;
@@ -25,7 +28,7 @@ module ALU (
     end
 
     assign status[0] = (val1[31] && val2[31] && !result[31]) || (!val1[31] && !val2[31] && result[31]); //v bit for overflow
-    assign status[1] = status[0]; //c bit forcarry
+    assign status[1] = cout;
     assign status[2] = (result == 32'd0); // z bit for zero detection
     assign status[3] = result[31]; //n bit for negative result
     
