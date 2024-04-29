@@ -23,7 +23,7 @@ module val2_generator(
     assign tmp2 = tmp >> (2 * rotate_imm);
 
     wire [31:0] tmp_shifted;
-    assign tmp_shifted = tmp2[63:32];
+    assign tmp_shifted = tmp2[31:0];
 
     always @(*) begin
         if (load_store_cmd)
