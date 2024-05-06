@@ -27,7 +27,9 @@ module ALU (
         endcase
     end
 
-    assign status[0] = (val1[31] && val2[31] && !result[31]) || (!val1[31] && !val2[31] && result[31]); //v bit for overflow
+    assign status[0] = ((exe_command==4'b0010)||((exe_command==4'b0011))) ? (result[31]&&(~val2[31])&&(~val1[31]))||((~result[31])&&(val2[31])&&(val1[31])) :
+               ((exe_command==4'b0100)||((exe_command==4'b0101))) ? ((~result[31])&&(~val2[31])&&(val1[31]))||((result[31])&&(val2[31])&&(~val1[31])):
+               1'b0; //v bit for overflow
     assign status[1] = cout;
     assign status[2] = (result == 32'd0); // z bit for zero detection
     assign status[3] = result[31]; //n bit for negative result

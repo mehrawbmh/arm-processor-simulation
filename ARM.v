@@ -424,7 +424,7 @@ wire WBR_mem_r_en_out;
 
 MA_stage ma_stage(
 	clk,EXR_mem_r_en_out,EXR_mem_w_en_out,
-	EXR_ST_val_out,EXR_ALU_result_out,
+	EXR_ALU_result_out,EXR_ST_val_out,
 	mem_result
 );
 

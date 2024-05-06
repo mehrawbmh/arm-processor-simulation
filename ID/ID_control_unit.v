@@ -71,7 +71,7 @@ module ID_control_Unit (
             endcase
         end
         else begin
-            if(op_code[3]==1'b0)
+            if(op_code[3]==1'b0) //branch
                 B=1'b1;
         end
 

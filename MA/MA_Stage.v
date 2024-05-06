@@ -12,5 +12,5 @@ module MA_stage(
         end
         
     end
-    assign mem_result=(mem_r_en)?memory[true_addr] :32'b0;
+    assign mem_result=(mem_r_en)?memory[true_addr] :32'bz;
 endmodule
