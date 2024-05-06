@@ -7,7 +7,7 @@ module MA_Stage_reg(
     output reg [3:0] Dest
     );
     
-    always@(posedge clk, negedge rst)begin
+    always@(posedge clk, posedge rst)begin
         if(rst)begin
         wb_en <= 1'b0;
         mem_r_en <= 1'b0;

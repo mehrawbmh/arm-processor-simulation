@@ -25,7 +25,7 @@ module val2_generator(
     wire [31:0] tmp_shifted;
     assign tmp_shifted = tmp2[31:0];
 	
-	wire [1:0] shift_case;
+	wire shift_case;
 	assign shift_case = shift_operand[6:5];
 
 	wire [4:0] rotate_imm2;

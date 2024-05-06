@@ -21,7 +21,7 @@ module ID_stage_reg(
   );
 
     always@(posedge clk)begin
-        if(rst || flush)begin
+        if(rst | flush)begin
             wb_en <= 0;
             mem_r_en <= 0;
             mem_w_en <= 0;

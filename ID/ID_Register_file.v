@@ -3,7 +3,7 @@ module ID_Register_file(
     input [3:0] src1,src2,dest_wb,
     input [31:0] result_wb,
     input write_back_en,
-    output reg [31:0] reg1,reg2
+    output  [31:0] reg1,reg2
 );
 
     reg [31:0] reg_mem [0:14] ;
