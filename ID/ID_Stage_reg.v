@@ -4,11 +4,11 @@ module ID_stage_reg(
     input [31:0] PC_in,
     input [3:0] exe_cmd_in,
     input [31:0] Val_Rn_in, Val_Rm_in,
+    input [3:0] src1_in, src2_in,
     input imm_in,
     input [11:0] shit_operand_in,
     input [23:0] signed_imm_24_in,
     input [3:0] Dest_in, SR_in,
-    
 
     output reg wb_en, mem_r_en, mem_w_en,B,S,
     output reg [31:0] PC,
@@ -17,7 +17,8 @@ module ID_stage_reg(
     output reg imm,
     output reg [11:0] shift_operand,
     output reg [23:0] signed_imm_24,
-    output reg [3:0] Dest, SR_out
+    output reg [3:0] Dest, SR_out,
+    output reg [3:0] src1_out, src2_out
   );
 
     always@(posedge clk)begin
@@ -36,6 +37,8 @@ module ID_stage_reg(
             signed_imm_24 <= 24'd0;
             Dest <= 4'd0;
      	    SR_out <= 4'd0;
+            src1_out <= 4'd0;
+            src2_out <= 4'd0;
             
         end
 
@@ -54,7 +57,9 @@ module ID_stage_reg(
             signed_imm_24 <= signed_imm_24_in;
             Dest <= Dest_in;
 	        SR_out <= SR_in;
-            
+            src1_out <= src1_in;
+            src2_out <= src2_in;
+
         end
 
 
