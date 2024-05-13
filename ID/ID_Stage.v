@@ -29,7 +29,8 @@ module ID_Stage (
     wire [8 : 0] control_in;
     wire mux_sel;    
     
-    assign src1=instruction[19:16];
+    assign src1 = instruction[19:16]; //Rn
+    assign src2 = instruction[3:0]; //Rm
     
     mux #(4) reg_mux(mem_w_en,instruction[3:0], instruction [15:12],src2);
 
@@ -43,7 +44,7 @@ module ID_Stage (
     assign mux_sel = hazard | ~check_res;
     assign control_in={S_out,B_out,mem_r_en_out,mem_w_en_out,wb_en_out,exe_cmd_out};
 
-    assign Dest=instruction[15:12];
+    assign Dest=instruction[15:12]; //Rd
     assign signed_imm_24=instruction[23:0];
     assign shift_operand=instruction[11:0];
     assign imm= instruction[25];
