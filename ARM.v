@@ -345,6 +345,7 @@ wire [31:0] IDR_PC_out,IDR_Val_Rn_out,IDR_Val_Rm_out;
 wire [3:0] IDR_exe_cmd_out,IDR_Dest_out, IDR_SR_out;
 wire [11:0] IDR_shift_operand_out;
 wire [23:0] IDR_signed_imm_24_out;
+wire [3:0] IDR_src1_out, IDR_src2_out;
 
 wire [31:0] WB_value;
 wire WBR_wb_en_out;
@@ -359,10 +360,10 @@ ID_Stage id_stage(
 );
 
 ID_stage_reg id_stage_register(
-	CLOCK_50,rst,IDR_B_out,wb_en,mem_r_en,mem_w_en,B,S,IFR_pc_out,exe_cmd,Val_Rn, Val_Rm,
+	CLOCK_50,rst,IDR_B_out,wb_en,mem_r_en,mem_w_en,B,S,IFR_pc_out,exe_cmd,Val_Rn, Val_Rm,src1,src2,
 	imm,shift_operand,signed_imm_24,Dest,SR,IDR_wb_en_out,IDR_mem_r_en_out,IDR_mem_w_en_out,
 	IDR_B_out,IDR_S_out,IDR_PC_out,IDR_exe_cmd_out,IDR_Val_Rn_out,IDR_Val_Rm_out,
-	IDR_imm_out,IDR_shift_operand_out,IDR_signed_imm_24_out,IDR_Dest_out, IDR_SR_out
+	IDR_imm_out,IDR_shift_operand_out,IDR_signed_imm_24_out,IDR_Dest_out, IDR_SR_out,IDR_src1_out, IDR_src2_out
 );
 
 
@@ -393,6 +394,7 @@ EX_Stage ex_stage (
 wire EXR_wb_en_out;
 wire EXR_mem_r_en_out;
 wire EXR_mem_w_en_out;
+wire [3:0] EXR_src1_out, EXR_src2_out;
 wire [31:0] EXR_ALU_result_out, EXR_ST_val_out;
 wire [3:0] EXR_dest_out;
 
@@ -403,6 +405,8 @@ ex_stage_reg EX_stage_register(
     IDR_mem_r_en_out,
     IDR_mem_w_en_out,
     IDR_Dest_out,
+	IDR_src1_out,
+	IDR_src2_out,
     ALU_result,
     IDR_Val_Rm_out,
     EXR_wb_en_out,
@@ -410,7 +414,9 @@ ex_stage_reg EX_stage_register(
     EXR_mem_w_en_out,
     EXR_ALU_result_out,
     EXR_ST_val_out,
-    EXR_dest_out
+    EXR_dest_out,
+	EXR_src1_out,
+	EXR_src2_out
 );
 
 
@@ -460,6 +466,25 @@ ID_hazard_detection_unit hazard_unit(
 	EXR_wb_en_out,
 	Two_src,
 	hazard_Detected
+);
+
+// forwarding unit
+
+wire forwardEn;
+wire EXE_sel_src1, EXE_sel_src2; //todo: connect them to MUXes inside EXE_stages
+
+assign forwardEn = 1'b1;
+
+Forwarding_unit forwardUnit(
+	EXR_src1_out,
+	EXR_src2_out,
+	EXR_dest_out,
+	WBR_Dest_out,
+	EXR_wb_en_out,
+	WBR_wb_en_out,
+	forwardEn,
+	EXE_sel_src1,
+	EXE_sel_src2
 );
 
 
