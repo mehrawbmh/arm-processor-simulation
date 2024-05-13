@@ -130,7 +130,7 @@ module ARM
 		//SD_CLK,							//	SD Card Clock
 		////////////////////	USB JTAG link	////////////////////
 		TDI,  							// CPLD -> FPGA (data in)
-		TCK,  							// CPLD -> FPGA (clk)
+		TCK,  							// CPLD -> FPGA (CLOCK_50)
 		TCS,  							// CPLD -> FPGA (CS)
 	   TDO,  							// FPGA -> CPLD (data out)
 		////////////////////	I2C		////////////////////////////
@@ -169,7 +169,7 @@ module ARM
 		TD_HS,							//	TV Decoder H_SYNC
 		TD_VS,							//	TV Decoder V_SYNC
 		TD_RESET,						//	TV Decoder Reset
-		TD_CLK27,                  //	TV Decoder 27MHz CLK
+		TD_CLK27,                  //	TV Decoder 27MHz CLOCK_50
 		////////////////////	GPIO	////////////////////////////
 		GPIO_0,							//	GPIO Connection 0
 		GPIO_1							//	GPIO Connection 1
@@ -264,7 +264,7 @@ input		 	   PS2_DAT;				//	PS2 Data
 input			   PS2_CLK;				//	PS2 Clock
 ////////////////////	USB JTAG link	////////////////////////////
 input  			TDI;					// CPLD -> FPGA (data in)
-input  			TCK;					// CPLD -> FPGA (clk)
+input  			TCK;					// CPLD -> FPGA (CLOCK_50)
 input  			TCS;					// CPLD -> FPGA (CS)
 output 			TDO;					// FPGA -> CPLD (data out)
 ////////////////////////	VGA			////////////////////////////
@@ -297,7 +297,7 @@ input	 [7:0]	TD_DATA;    			//	TV Decoder Data bus 8 bits
 input			   TD_HS;					//	TV Decoder H_SYNC
 input			   TD_VS;					//	TV Decoder V_SYNC
 output			TD_RESET;				//	TV Decoder Reset
-input          TD_CLK27;            //	TV Decoder 27MHz CLK
+input          TD_CLK27;            //	TV Decoder 27MHz CLOCK_50
 ////////////////////////	GPIO	////////////////////////////////
 inout	[35:0]	GPIO_0;					//	GPIO Connection 0
 inout	[35:0]	GPIO_1;					//	GPIO Connection 1
@@ -308,8 +308,8 @@ wire [31:0] pc,instruction,IFR_pc_out,IFR_instruction_out;
 wire IDR_B_out, freeze;
 wire [31:0] Branch_addr;
 
-wire clk,rst;
-assign clk=CLOCK_50;
+wire rst;
+
 assign rst=SW[0];
 
 
@@ -317,8 +317,8 @@ assign rst=SW[0];
 wire hazard_Detected;
 
 /// IF
-IF_Stage if_stage(clk,rst,hazard_Detected,IDR_B_out,Branch_addr,pc,instruction);
-IF_Stage_reg if_stage_register(clk,rst,hazard_Detected,IDR_B_out,pc,instruction,IFR_pc_out,IFR_instruction_out);
+IF_Stage if_stage(CLOCK_50,rst,hazard_Detected,IDR_B_out,Branch_addr,pc,instruction);
+IF_Stage_reg if_stage_register(CLOCK_50,rst,hazard_Detected,IDR_B_out,pc,instruction,IFR_pc_out,IFR_instruction_out);
 
 // ID wires
 // inputs
@@ -353,13 +353,13 @@ wire [3:0]  WBR_Dest_out;
 // ID
 
 ID_Stage id_stage(
-	clk,rst,IFR_instruction_out,WB_value,WBR_wb_en_out,WBR_Dest_out,hazard_Detected,
+	CLOCK_50,rst,IFR_instruction_out,WB_value,WBR_wb_en_out,WBR_Dest_out,hazard_Detected,
 	SR,wb_en,mem_r_en,mem_w_en,B,S,exe_cmd,Val_Rn, Val_Rm,imm,shift_operand,signed_imm_24,Dest,
 	src1,src2,Two_src
 );
 
 ID_stage_reg id_stage_register(
-	clk,rst,IDR_B_out,wb_en,mem_r_en,mem_w_en,B,S,IFR_pc_out,exe_cmd,Val_Rn, Val_Rm,
+	CLOCK_50,rst,IDR_B_out,wb_en,mem_r_en,mem_w_en,B,S,IFR_pc_out,exe_cmd,Val_Rn, Val_Rm,
 	imm,shift_operand,signed_imm_24,Dest,SR,IDR_wb_en_out,IDR_mem_r_en_out,IDR_mem_w_en_out,
 	IDR_B_out,IDR_S_out,IDR_PC_out,IDR_exe_cmd_out,IDR_Val_Rn_out,IDR_Val_Rm_out,
 	IDR_imm_out,IDR_shift_operand_out,IDR_signed_imm_24_out,IDR_Dest_out, IDR_SR_out
@@ -370,10 +370,10 @@ ID_stage_reg id_stage_register(
 wire [3:0] EX_status_out, ALU_status_out;
 wire [31:0] ALU_result;
 
-status_reg st_reg(clk, rst, IDR_S_out, ALU_status_out, SR);
+status_reg st_reg(CLOCK_50, rst, IDR_S_out, ALU_status_out, SR);
 
 EX_Stage ex_stage (
-    clk,
+    CLOCK_50,
     rst,
     IDR_exe_cmd_out,
     IDR_mem_r_en_out,
@@ -397,7 +397,7 @@ wire [31:0] EXR_ALU_result_out, EXR_ST_val_out;
 wire [3:0] EXR_dest_out;
 
 ex_stage_reg EX_stage_register(
-    clk,
+    CLOCK_50,
     rst,
     IDR_wb_en_out,
     IDR_mem_r_en_out,
@@ -423,13 +423,13 @@ wire [31:0] mem_result,WBR_ALU_result_out,WBR_mem_read_value_out;
 wire WBR_mem_r_en_out;
 
 MA_stage ma_stage(
-	clk,EXR_mem_r_en_out,EXR_mem_w_en_out,
+	CLOCK_50,EXR_mem_r_en_out,EXR_mem_w_en_out,
 	EXR_ALU_result_out,EXR_ST_val_out,
 	mem_result
 );
 
 MA_Stage_reg ma_stage_reg (
-	clk,rst,EXR_wb_en_out,EXR_mem_r_en_out,
+	CLOCK_50,rst,EXR_wb_en_out,EXR_mem_r_en_out,
 	EXR_ALU_result_out,mem_result,
 	EXR_dest_out,
 	WBR_wb_en_out,WBR_mem_r_en_out,
