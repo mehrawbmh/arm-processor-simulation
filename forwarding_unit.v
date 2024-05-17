@@ -1,8 +1,8 @@
 module Forwarding_unit(
-    input src1,
-    input src2,
-    input dest_EX_reg,
-    input dest_MA_reg,
+    input[3:0] src1,
+    input[3:0] src2,
+    input[3:0] dest_EX_reg,
+    input[3:0] dest_MA_reg,
     input wb_en_EX_reg,
     input wb_en_MA_reg,
     input forward_en,

@@ -11,6 +11,7 @@ module EX_Stage (
     input [11:0] shift_operand,
     input [23:0] sigend_imm_24,
     input [3:0] status_reg,
+    input [1:0] sel_src1, sel_src2,
     output [31:0] alu_result, br_addr,
     output [3:0] status
 ); 

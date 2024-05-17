@@ -371,6 +371,9 @@ ID_stage_reg id_stage_register(
 wire [3:0] EX_status_out, ALU_status_out;
 wire [31:0] ALU_result;
 
+wire forwardEn;
+wire[1:0] EXE_sel_src1, EXE_sel_src2;
+
 status_reg st_reg(CLOCK_50, rst, IDR_S_out, ALU_status_out, SR);
 
 EX_Stage ex_stage (
@@ -386,6 +389,8 @@ EX_Stage ex_stage (
     IDR_shift_operand_out,
     IDR_signed_imm_24_out,
     IDR_SR_out,
+    EXE_sel_src1,
+    EXE_sel_src2,
     ALU_result,
     Branch_addr,
     ALU_status_out
@@ -453,7 +458,7 @@ WB_Stage wb_stage(
 	WB_value
 );
 
-
+assign forwardEn = 1'b0;
 
 // hazard unit
 
@@ -464,16 +469,12 @@ ID_hazard_detection_unit hazard_unit(
 	IDR_wb_en_out,
 	EXR_dest_out,
 	EXR_wb_en_out,
+	forwardEn,
 	Two_src,
 	hazard_Detected
 );
 
-// forwarding unit
 
-wire forwardEn;
-wire EXE_sel_src1, EXE_sel_src2; //todo: connect them to MUXes inside EXE_stages
-
-assign forwardEn = 1'b1;
 
 Forwarding_unit forwardUnit(
 	EXR_src1_out,
