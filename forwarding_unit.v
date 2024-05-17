@@ -6,8 +6,8 @@ module Forwarding_unit(
     input wb_en_EX_reg,
     input wb_en_MA_reg,
     input forward_en,
-    output[1:0] sel_src1,
-    output[1:0] sel_src2
+    output reg[1:0] sel_src1,
+    output reg[1:0] sel_src2
 );
     always @(*) begin
         if (forward_en) begin
