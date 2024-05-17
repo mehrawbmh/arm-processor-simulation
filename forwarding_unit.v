@@ -15,7 +15,7 @@ module Forwarding_unit(
                 sel_src1 = 2'b01;
             end
             else if (wb_en_MA_reg && src1 == dest_MA_reg) begin
-                sel_src1 2'b10;
+                sel_src1 = 2'b10;
             end
             else begin
                 sel_src1 = 2'b00;
@@ -31,7 +31,7 @@ module Forwarding_unit(
                 sel_src2 = 2'b01;
             end
             else if (wb_en_MA_reg && src2 == dest_MA_reg) begin
-                sel_src2 2'b10;
+                sel_src2 = 2'b10;
             end
             else begin
                 sel_src2 = 2'b00;
