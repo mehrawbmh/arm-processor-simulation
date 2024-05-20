@@ -7,12 +7,13 @@ module ID_hazard_detection_unit(
     input Mem_WB_En,
     input forward_en,
     input Two_Src,
+    input IDR_MemRead_En,
     output reg hazard_Detected
 );
 
-always@(*)begin
+always@(*) begin
     if (!forward_en) begin
-            hazard_Detected = 1'b0;
+        hazard_Detected = 1'b0;
         if(Exe_WB_En && (src1 == Exe_Dest))
             hazard_Detected = 1'b1; 
         if(Mem_WB_En && (src1 == Mem_Dest))
@@ -21,6 +22,12 @@ always@(*)begin
             hazard_Detected = 1'b1;
         if(Mem_WB_En && Two_Src && (src2 == Mem_Dest))
             hazard_Detected = 1'b1;
+    end else begin
+	    hazard_Detected = 1'b0;
+	    if (IDR_MemRead_En && src1 == Exe_Dest)
+	        hazard_Detected = 1'b1;
+	    if (IDR_MemRead_En && src2 == Exe_Dest)
+	        hazard_Detected = 1'b1;
     end
 end
 

@@ -326,11 +326,6 @@ IF_Stage_reg if_stage_register(CLOCK_50,rst,hazard_Detected,IDR_B_out,pc,instruc
 wire [3:0] SR;
 
 
-
-
-
-
-
 //outputs
 wire wb_en,mem_r_en,mem_w_en,B,S,imm,Two_src;
 wire [3:0] exe_cmd,Dest;
@@ -348,6 +343,7 @@ wire [23:0] IDR_signed_imm_24_out;
 wire [3:0] IDR_src1_out, IDR_src2_out;
 
 wire [31:0] WB_value;
+wire [31:0] EXR_ALU_result_out;
 wire WBR_wb_en_out;
 
 wire [3:0]  WBR_Dest_out;
@@ -391,6 +387,8 @@ EX_Stage ex_stage (
     IDR_SR_out,
     EXE_sel_src1,
     EXE_sel_src2,
+    EXR_ALU_result_out,
+    WB_value,
     ALU_result,
     Branch_addr,
     ALU_status_out
@@ -400,7 +398,7 @@ wire EXR_wb_en_out;
 wire EXR_mem_r_en_out;
 wire EXR_mem_w_en_out;
 wire [3:0] EXR_src1_out, EXR_src2_out;
-wire [31:0] EXR_ALU_result_out, EXR_ST_val_out;
+wire [31:0] EXR_ST_val_out;
 wire [3:0] EXR_dest_out;
 
 ex_stage_reg EX_stage_register(
@@ -410,8 +408,8 @@ ex_stage_reg EX_stage_register(
     IDR_mem_r_en_out,
     IDR_mem_w_en_out,
     IDR_Dest_out,
-	IDR_src1_out,
-	IDR_src2_out,
+    IDR_src1_out,
+    IDR_src2_out,
     ALU_result,
     IDR_Val_Rm_out,
     EXR_wb_en_out,
@@ -420,8 +418,8 @@ ex_stage_reg EX_stage_register(
     EXR_ALU_result_out,
     EXR_ST_val_out,
     EXR_dest_out,
-	EXR_src1_out,
-	EXR_src2_out
+    EXR_src1_out,
+    EXR_src2_out
 );
 
 
@@ -471,6 +469,7 @@ ID_hazard_detection_unit hazard_unit(
 	EXR_wb_en_out,
 	forwardEn,
 	Two_src,
+	IDR_mem_r_en_out,
 	hazard_Detected
 );
 
