@@ -12,7 +12,7 @@ module ID_hazard_detection_unit(
 );
 
 always@(*) begin
-    if (!forward_en) begin
+    if (~forward_en) begin
         hazard_Detected = 1'b0;
         if(Exe_WB_En && (src1 == Exe_Dest))
             hazard_Detected = 1'b1; 

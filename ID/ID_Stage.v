@@ -30,7 +30,7 @@ module ID_Stage (
     wire mux_sel;    
     
     assign src1 = instruction[19:16]; //Rn
-    assign src2 = instruction[3:0]; //Rm
+    
     
     mux #(4) reg_mux(mem_w_en,instruction[3:0], instruction [15:12],src2);
 
