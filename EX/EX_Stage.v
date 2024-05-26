@@ -14,9 +14,10 @@ module EX_Stage (
     input [1:0] sel_src1, sel_src2,
     input [31:0] EXR_ALU_value, WBR_value,
     output [31:0] alu_result, br_addr,
+    output [31:0] real_val_rm,
     output [3:0] status
 ); 
-    wire [31:0] val2, real_val_rm, real_val_rn;
+    wire [31:0] val2, real_val_rn;
     
     wire [31:0] imm32;
     assign imm32 = sigend_imm_24[23] ? {8'b11111111, sigend_imm_24} : {8'd0, sigend_imm_24};

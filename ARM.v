@@ -365,7 +365,7 @@ ID_stage_reg id_stage_register(
 
 //EXE
 wire [3:0] EX_status_out, ALU_status_out;
-wire [31:0] ALU_result;
+wire [31:0] ALU_result, EXR_new_val_rm_out;
 
 wire forwardEn;
 wire[1:0] EXE_sel_src1, EXE_sel_src2;
@@ -391,6 +391,7 @@ EX_Stage ex_stage (
     WB_value,
     ALU_result,
     Branch_addr,
+	EXR_new_val_rm_out,
     ALU_status_out
 );
 
@@ -411,7 +412,7 @@ ex_stage_reg EX_stage_register(
     IDR_src1_out,
     IDR_src2_out,
     ALU_result,
-    IDR_Val_Rm_out,
+    EXR_new_val_rm_out,
     EXR_wb_en_out,
     EXR_mem_r_en_out,
     EXR_mem_w_en_out,
