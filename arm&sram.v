@@ -307,7 +307,7 @@ inout	[35:0]	GPIO_1;					//	GPIO Connection 1
 wire [31:0] pc,instruction,IFR_pc_out,IFR_instruction_out;
 wire IDR_B_out, freeze;
 wire [31:0] Branch_addr;
-
+wire sram_freeze;
 wire rst;
 
 assign rst=SW[0];
@@ -317,8 +317,8 @@ assign rst=SW[0];
 wire hazard_Detected;
 
 /// IF
-IF_Stage if_stage(CLOCK_50,rst,hazard_Detected,IDR_B_out,Branch_addr,pc,instruction);
-IF_Stage_reg if_stage_register(CLOCK_50,rst,hazard_Detected,IDR_B_out,pc,instruction,IFR_pc_out,IFR_instruction_out);
+IF_Stage if_stage(CLOCK_50,rst,hazard_Detected | sram_freeze,IDR_B_out,Branch_addr,pc,instruction);
+IF_Stage_reg if_stage_register(CLOCK_50,rst,hazard_Detected | sram_freeze ,IDR_B_out,pc,instruction,IFR_pc_out,IFR_instruction_out);
 
 // ID wires
 // inputs
@@ -356,7 +356,7 @@ ID_Stage id_stage(
 );
 
 ID_stage_reg id_stage_register(
-	CLOCK_50,rst,IDR_B_out,wb_en,mem_r_en,mem_w_en,B,S,IFR_pc_out,exe_cmd,Val_Rn, Val_Rm,src1,src2,
+	CLOCK_50,rst,IDR_B_out,sram_freeze,wb_en,mem_r_en,mem_w_en,B,S,IFR_pc_out,exe_cmd,Val_Rn, Val_Rm,src1,src2,
 	imm,shift_operand,signed_imm_24,Dest,SR,IDR_wb_en_out,IDR_mem_r_en_out,IDR_mem_w_en_out,
 	IDR_B_out,IDR_S_out,IDR_PC_out,IDR_exe_cmd_out,IDR_Val_Rn_out,IDR_Val_Rm_out,
 	IDR_imm_out,IDR_shift_operand_out,IDR_signed_imm_24_out,IDR_Dest_out, IDR_SR_out,IDR_src1_out, IDR_src2_out
@@ -433,7 +433,7 @@ wire [31:0] mem_result,WBR_ALU_result_out,WBR_mem_read_value_out;
 wire WBR_mem_r_en_out;
 
 wire [31:0] Sram_read_data;
-wire sram_freeze;
+
 wire [15:0] SRAM_DQ;
 wire [17:0] SRAM_ADDR;
 wire SRAM_WE_N,ready;
@@ -450,11 +450,25 @@ sram_controller sram_con(
     sram_freeze,
     SRAM_DQ,
     SRAM_ADDR,
-
+    SRAM_WE_N,ready,
+    SRAM_UB_N,SRAM_LB_N,SRAM_CE_N,SRAM_OE_N
 );
 
+sram Sra(
+    CLOCK_50,rst,
+    SRAM_DQ,
+    SRAM_ADDR,
+    SRAM_UB_N,
+    SRAM_LB_N,
+    SRAM_WE_N,
+    SRAM_CE_N,
+    SRAM_OE_N
+);
+
+wire real_wb_en;
+assign real_wb_en=(sram_freeze)? 1'b0:EXR_wb_en_out;
 MA_Stage_reg ma_stage_reg (
-	CLOCK_50,rst,EXR_wb_en_out,EXR_mem_r_en_out,
+	CLOCK_50,rst,real_wb_en,EXR_mem_r_en_out,
 	EXR_ALU_result_out,mem_result,
 	EXR_dest_out,
 	WBR_wb_en_out,WBR_mem_r_en_out,

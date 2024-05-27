@@ -1,5 +1,5 @@
 module ID_stage_reg(
-    input clk, rst, flush,
+    input clk, rst, flush,sram_freeze,
     input wb_en_in, mem_r_en_in, mem_w_en_in,B_in,S_in,
     input [31:0] PC_in,
     input [3:0] exe_cmd_in,
@@ -42,7 +42,7 @@ module ID_stage_reg(
             
         end
 
-        else begin
+        else if (~sram_freeze) begin
             wb_en <= wb_en_in;
             mem_r_en <= mem_r_en_in;
             mem_w_en <= mem_w_en_in;
