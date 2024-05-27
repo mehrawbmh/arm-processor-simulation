@@ -16,74 +16,74 @@ module sram_controller(
     );
 
     reg [3:0] ps,ns;
-    parameter [3:0]
-    mem =0 , w_low=1,w_high=2,w_ne=3,noop=4,r_e=5,r_low=6,r_high=7,Ready=8;
+    parameter [3:0] IDLE = 0, W_LOW = 1, W_HIGH = 2, W_NE = 3, NOP = 4, R_E = 5, R_LOW = 6, R_HIGH = 7, Ready = 8;
     wire [15:0] d;
     assign d = SRAM_DQ;
 
-    always @(posedge clk)begin
-		if(rst)
-			ps <= mem;
+    always @(posedge clk) begin
+		if (rst)
+			ps <= IDLE;
 		else
 			ps <= ns;
     end
-    always @(*)begin
-        ns=mem;
+
+    always @(*) begin
+        ns=IDLE;
+
         case(ps)
-        mem : begin
-        if(wr_en)
-            ns=w_low;
-        if(rd_en)
-            ns=r_e;
-        end
-        w_low : 
-            ns=w_high;
-        w_high :
-            ns= w_ne;
-        w_ne :
-            ns= noop;
-        noop:
-            ns=ready;
-        r_e:
-            ns=r_low;
-        r_low:
-            ns=r_high;
-        r_high:
-            ns=noop;
+            IDLE : begin
+                if(wr_en)
+                    ns=W_LOW;
+                if(rd_en)
+                    ns=R_E;
+            end
+            
+            W_LOW : 
+                ns=W_HIGH;
+            W_HIGH :
+                ns= W_NE;
+            W_NE :
+                ns= NOP;
+            NOP:
+                ns=ready;
+            R_E:
+                ns=R_LOW;
+            R_LOW:
+                ns=R_HIGH;
+            R_HIGH:
+                ns=NOP;
         endcase
 
     end
 
     always@(*)begin
-        
-
         SRAM_WE_N=1'b1;
         ready=1'b0;
         SRAM_ADDR = 18'b0;
+
         case(ps)
-            mem:begin
+            IDLE:begin
                 sram_freeze=rd_en | wr_en;
             end
-            w_low: begin
+            W_LOW: begin
                 SRAM_WE_N=1'b0;
                 SRAM_ADDR={address[18:2],1'b0};
-                
             end
-            w_high:begin
+            W_HIGH:begin
                 SRAM_WE_N=1'b0;
                 SRAM_ADDR={address[18:2],1};
             end
-            w_ne:
+            W_NE:
                 SRAM_WE_N=1'b1;
-            r_e:begin
+            R_E:begin
                 SRAM_WE_N=1'b1;
                 SRAM_ADDR={address[18:2],1'b0};
             end
-            r_low:begin
+            R_LOW:begin
                 SRAM_ADDR={address[18:2],1'b1};
                 read_data={16'b0,d};
             end
-            r_high:begin
+            R_HIGH:begin
                 read_data[31:16]=d;
             end
             Ready:begin
@@ -91,16 +91,11 @@ module sram_controller(
                 sram_freeze=1'b0;
             end
 
-
-
-
-
         endcase
 
     end
-assign {SRAM_UB_N,SRAM_LB_N,SRAM_CE_N,SRAM_OE_N}=4'b0;
-assign SRAM_DQ=(ps == w_low)? write_data[15 : 0] :
-                (ps == w_high)? write_data[31 : 16] : 16'bz;
-
+    assign {SRAM_UB_N,SRAM_LB_N,SRAM_CE_N,SRAM_OE_N} = 4'b0;
+    assign SRAM_DQ = (ps == W_LOW) ? write_data[15 : 0] :
+                (ps == W_HIGH) ? write_data[31 : 16] : 16'bz;
 
 endmodule
