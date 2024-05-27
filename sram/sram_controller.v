@@ -60,7 +60,7 @@ module sram_controller(
         SRAM_WE_N=1'b1;
         ready=1'b0;
         SRAM_ADDR = 18'b0;
-
+        sram_freeze=1'b0;
         case(ps)
             IDLE:begin
                 sram_freeze=rd_en | wr_en;
@@ -68,23 +68,32 @@ module sram_controller(
             W_LOW: begin
                 SRAM_WE_N=1'b0;
                 SRAM_ADDR={address[18:2],1'b0};
+                sram_freeze=1'b1;
             end
             W_HIGH:begin
                 SRAM_WE_N=1'b0;
                 SRAM_ADDR={address[18:2],1};
+                sram_freeze=1'b1;
             end
-            W_NE:
+            W_NE:begin
+                sram_freeze=1'b1;
                 SRAM_WE_N=1'b1;
+            end
             R_E:begin
                 SRAM_WE_N=1'b1;
                 SRAM_ADDR={address[18:2],1'b0};
+                sram_freeze=1'b1;
             end
             R_LOW:begin
                 SRAM_ADDR={address[18:2],1'b1};
                 read_data={16'b0,d};
+                sram_freeze=1'b1;
             end
+            NOP:
+                sram_freeze=1'b1;
             R_HIGH:begin
                 read_data[31:16]=d;
+                sram_freeze=1'b1;
             end
             Ready:begin
                 ready=1'b1;
