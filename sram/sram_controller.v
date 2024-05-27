@@ -8,7 +8,7 @@ module sram_controller(
 
     // to next stage
     output reg[31:0] read_data,
-
+    output reg sram_freeze,
     inout reg [15:0] SRAM_DQ,
     output reg [17:0] SRAM_ADDR,
     output reg SRAM_WE_N,ready,
@@ -61,6 +61,9 @@ module sram_controller(
         ready=1'b0;
         SRAM_ADDR = 18'b0;
         case(ps)
+            mem:begin
+                sram_freeze=rd_en | wr_en;
+            end
             w_low: begin
                 SRAM_WE_N=1'b0;
                 SRAM_ADDR={address[18:2],1'b0};
@@ -83,8 +86,10 @@ module sram_controller(
             r_high:begin
                 read_data[31:16]=d;
             end
-            Ready:
+            Ready:begin
                 ready=1'b1;
+                sram_freeze=1'b0;
+            end
 
 
 
