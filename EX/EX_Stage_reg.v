@@ -1,6 +1,7 @@
 module ex_stage_reg(
     input clk,
     input rst,
+    input freeze,
     input wb_en_in,
     input mem_r_en_in,
     input mem_w_en_in,
@@ -25,7 +26,7 @@ module ex_stage_reg(
             src2_out <= 4'd0;
 
         end
-        else begin
+        else if (~freeze) begin
             wb_en_out <= wb_en_in;
             mem_r_en_out <= mem_r_en_in;
             mem_w_en_out <= mem_w_en_in;

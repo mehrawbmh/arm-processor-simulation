@@ -1,5 +1,5 @@
 module MA_Stage_reg(
-    input clk,rst,wb_en_in,mem_r_en_in,
+    input clk,rst, freeze, wb_en_in,mem_r_en_in,
     input[31:0] alu_result_in,mem_read_value_in,
     input [3:0] Dest_in,
     output reg wb_en,mem_r_en,
@@ -15,7 +15,7 @@ module MA_Stage_reg(
         mem_read_value <= 32'b0;
         Dest <= 4'b0;
     end
-	 else begin
+	 else if (~freeze) begin
         wb_en <= wb_en_in;
         mem_r_en <= mem_r_en_in;
         alu_result <= alu_result_in;

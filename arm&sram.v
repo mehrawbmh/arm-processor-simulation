@@ -405,6 +405,7 @@ wire [3:0] EXR_dest_out;
 ex_stage_reg EX_stage_register(
     CLOCK_50,
     rst,
+	sram_freeze,
     IDR_wb_en_out,
     IDR_mem_r_en_out,
     IDR_mem_w_en_out,
@@ -454,7 +455,7 @@ sram_controller sram_con(
 );
 
 MA_Stage_reg ma_stage_reg (
-	CLOCK_50,rst,EXR_wb_en_out,EXR_mem_r_en_out,
+	CLOCK_50,rst, sram_freeze, EXR_wb_en_out,EXR_mem_r_en_out,
 	EXR_ALU_result_out,mem_result,
 	EXR_dest_out,
 	WBR_wb_en_out,WBR_mem_r_en_out,
