@@ -23,7 +23,7 @@ module EX_Stage (
     assign imm32 = sigend_imm_24[23] ? {8'b11111111, sigend_imm_24} : {8'd0, sigend_imm_24};
 
     assign real_val_rn = (sel_src1 == 2'b01) ? EXR_ALU_value : (sel_src1 == 2'b10) ? WBR_value : val_rn;
-    assign real_val_rm = (sel_src1 == 2'b01) ? EXR_ALU_value : (sel_src1 == 2'b10) ? WBR_value : val_rm;
+    assign real_val_rm = (sel_src2 == 2'b01) ? EXR_ALU_value : (sel_src2 == 2'b10) ? WBR_value : val_rm;
 	
     val2_generator valGen(real_val_rm, imm,shift_operand,mem_R_en, mem_W_en, val2);
     ALU alu (real_val_rn, val2, status_reg[1], exe_command, alu_result, status);

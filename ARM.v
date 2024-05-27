@@ -457,7 +457,7 @@ WB_Stage wb_stage(
 	WB_value
 );
 
-assign forwardEn = 1'b0;
+assign forwardEn = 1'b1;
 
 // hazard unit
 
@@ -477,8 +477,8 @@ ID_hazard_detection_unit hazard_unit(
 
 
 Forwarding_unit forwardUnit(
-	EXR_src1_out,
-	EXR_src2_out,
+	IDR_src1_out,
+	IDR_src2_out,
 	EXR_dest_out,
 	WBR_Dest_out,
 	EXR_wb_en_out,
