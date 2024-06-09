@@ -487,7 +487,7 @@ WB_Stage wb_stage(
 	WB_value
 );
 
-assign forwardEn = 1'b0;
+assign forwardEn = 1'b1;
 
 // hazard unit
 
