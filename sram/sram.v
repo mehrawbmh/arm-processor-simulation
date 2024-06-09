@@ -17,7 +17,7 @@ module sram(
   
     reg [15:0] memory [0:63];
 
-    
+    //wire [17:0] true_addr=(SRAM_ADDR-18'd1024)>>2;
     integer i;
     always@(posedge rst)
     begin

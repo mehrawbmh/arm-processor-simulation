@@ -19,6 +19,8 @@ module sram_controller(
     parameter [3:0] IDLE = 0, W_LOW = 1, W_HIGH = 2, W_NE = 3, NOP = 4, R_E = 5, R_LOW = 6, R_HIGH = 7, Ready = 8;
     wire [15:0] d;
     assign d = SRAM_DQ;
+    wire[31:0] address2;
+    assign address2=address-32'd1024;
 
     always @(posedge clk) begin
 		if (rst)
@@ -69,12 +71,12 @@ module sram_controller(
             end
             W_LOW: begin
                 SRAM_WE_N=1'b0;
-                SRAM_ADDR={address[18:2],1'b0};
+                SRAM_ADDR={address2[18:2],1'b0};
                 sram_freeze=1'b1;
             end
             W_HIGH:begin
                 SRAM_WE_N=1'b0;
-                SRAM_ADDR={address[18:2],1'b1};
+                SRAM_ADDR={address2[18:2],1'b1};
                 sram_freeze=1'b1;
             end
             W_NE:begin
@@ -83,11 +85,11 @@ module sram_controller(
             end
             R_E:begin
                 SRAM_WE_N=1'b1;
-                SRAM_ADDR={address[18:2],1'b0};
+                SRAM_ADDR={address2[18:2],1'b0};
                 sram_freeze=1'b1;
             end
             R_LOW:begin
-                SRAM_ADDR={address[18:2],1'b1};
+                SRAM_ADDR={address2[18:2],1'b1};
                 read_data={16'b0,d};
                 sram_freeze=1'b1;
             end
