@@ -11,7 +11,7 @@ module Forwarding_unit(
     output reg[1:0] sel_src2
 );
     always @(*) begin
-        if(~sram_freeze)begin
+        
             if (forward_en) begin
                 if (wb_en_EX_reg && src1 == dest_EX_reg) begin
                     sel_src1 = 2'b01;
@@ -24,12 +24,11 @@ module Forwarding_unit(
                 end
             end
             else sel_src1 = 2'b00;
-            end
     end
 
 
     always @(*) begin
-        if (~sram_freeze)begin
+        
             if (forward_en) begin
                 if (wb_en_EX_reg && src2 == dest_EX_reg) begin
                     sel_src2 = 2'b01;
@@ -42,7 +41,6 @@ module Forwarding_unit(
                 end
             end
             else sel_src2 = 2'b00;
-            end
     end
 
 endmodule
