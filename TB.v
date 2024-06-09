@@ -5,7 +5,7 @@ module TB();
     reg CLOCK_50;
     reg [17:0] SW;
     
-ARM A1(
+ARM_and_Sram AS1(
 		////////////////////	Clock Input	 	////////////////////	 
 		CLOCK_27,						//	27 MHz
 		CLOCK_50,						//	50 MHz
