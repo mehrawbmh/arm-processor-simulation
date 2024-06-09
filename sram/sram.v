@@ -1,4 +1,3 @@
-
 `timescale 1ns/1ns
 module sram(
     clk,
@@ -17,6 +16,8 @@ module sram(
     input clk, rst, SRAM_UB_N, SRAM_LB_N, SRAM_WE_N, SRAM_CE_N, SRAM_OE_N;
   
     reg [15:0] memory [0:63];
+
+    
     integer i;
     always@(posedge rst)
     begin

@@ -45,13 +45,15 @@ module sram_controller(
             W_NE :
                 ns= NOP;
             NOP:
-                ns=ready;
+                ns=Ready;
             R_E:
                 ns=R_LOW;
             R_LOW:
                 ns=R_HIGH;
             R_HIGH:
                 ns=NOP;
+            Ready:
+            ns=IDLE;
         endcase
 
     end
@@ -72,7 +74,7 @@ module sram_controller(
             end
             W_HIGH:begin
                 SRAM_WE_N=1'b0;
-                SRAM_ADDR={address[18:2],1};
+                SRAM_ADDR={address[18:2],1'b1};
                 sram_freeze=1'b1;
             end
             W_NE:begin

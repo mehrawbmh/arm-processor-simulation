@@ -470,7 +470,7 @@ wire real_wb_en;
 assign real_wb_en=(sram_freeze)? 1'b0:EXR_wb_en_out;
 MA_Stage_reg ma_stage_reg (
 	CLOCK_50,rst, sram_freeze, real_wb_en,EXR_mem_r_en_out,
-	EXR_ALU_result_out,SRAM_DQ,
+	EXR_ALU_result_out,Sram_read_data,
 	EXR_dest_out,
 	WBR_wb_en_out,WBR_mem_r_en_out,
 	WBR_ALU_result_out,WBR_mem_read_value_out,
