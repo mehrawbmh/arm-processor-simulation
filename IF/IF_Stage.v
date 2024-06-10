@@ -5,11 +5,13 @@ module IF_Stage (
     input branch_taken,
     input [31:0] branch_addr,
     output  [31:0] PC,
-    output  [31:0] instruction
+    output  [31:0] instruction,
+    output flag
 );
     wire [31:0] pcOut,pcIn; 
+    
     instruction_Memory aa(pcOut,instruction);
-    pc_reg bb(clk,rst,freeze,pcIn,pcOut);
+    pc_reg bb(clk,rst,freeze,pcIn,pcOut,flag);
     IF_mux cc(branch_taken,PC,branch_addr,pcIn);
     IF_adder dd(clk,rst,pcOut,PC);
     

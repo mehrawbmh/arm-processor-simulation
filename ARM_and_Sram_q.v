@@ -314,10 +314,10 @@ assign rst=SW[0];
 
 
 
-wire hazard_Detected;
-
+wire hazard_Detected,flag;
+assign LEDR[0]=flag;
 /// IF
-IF_Stage if_stage(CLOCK_50,rst,hazard_Detected | sram_freeze,IDR_B_out,Branch_addr,pc,instruction);
+IF_Stage if_stage(CLOCK_50,rst,hazard_Detected | sram_freeze,IDR_B_out,Branch_addr,pc,instruction,flag);
 IF_Stage_reg if_stage_register(CLOCK_50,rst,hazard_Detected | sram_freeze ,IDR_B_out,pc,instruction,IFR_pc_out,IFR_instruction_out);
 
 // ID wires
