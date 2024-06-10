@@ -65,7 +65,7 @@ module sram_controller(
     end
 
     always@(*)begin
-        SRAM_WE_N=1'b1;
+        SRAM_WE_N=1'bz;
         ready=1'b0;
         SRAM_ADDR = 18'b0;
         sram_freeze=1'b0;
@@ -87,7 +87,8 @@ module sram_controller(
             end
             W_NE:begin
                 sram_freeze=1'b1;
-                SRAM_WE_N=1'b1;
+                
+                
             end
             R_E:begin
                 SRAM_WE_N=1'b1;
@@ -97,7 +98,7 @@ module sram_controller(
             end
             R_LOW:begin
                 SRAM_ADDR={address2[18:2],1'b1};
-                
+                SRAM_WE_N=1'b1;
                 ld1=1'b1;
                 sram_freeze=1'b1;
             end
@@ -118,7 +119,7 @@ module sram_controller(
     end
     assign {SRAM_UB_N,SRAM_LB_N,SRAM_CE_N,SRAM_OE_N} = 4'b0;
     assign SRAM_DQ = (ps == W_LOW) ? write_data[15 : 0] :
-                (ps == W_HIGH) ? write_data[31 : 16] : 16'bz;
+                (ps == W_HIGH) ? write_data[31 : 16] : 16'bzzzzzzzzzzzzzzzz;
 
 
     
@@ -131,9 +132,9 @@ module Reg_Read(input clk, rst, ld1, ld2, inout [15:0] data1, data2, output reg 
         if (rst)
             data_out <= 32'b0;
         else if (ld1)
-            data_out[15:0] <= data1;
+            data_out[15:0] = data1;
         else if (ld2)
-            data_out[31:16] <= data2;
+            data_out[31:16] = data2;
         
     end
 endmodule
