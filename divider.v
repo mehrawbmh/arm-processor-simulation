@@ -4,7 +4,7 @@ module DivideBy2 (
   output logic clkOut
 );
 
-  always_ff @(posedge clk or negedge rstN) begin
+  always @(posedge clk or negedge rstN) begin
     if (!rstN) begin
       clkOut <= 0;
     end

@@ -20,7 +20,7 @@ module sram(
     reg [15:0] read_data;
     reg SRAM_WE_reg;
     integer i;
-    always@(posedge rst)
+    always@(negedge rst)
     begin
         if (rst) 
         for(i = 0; i <= 63; i = i + 1) begin
@@ -28,7 +28,7 @@ module sram(
         end
     end
   
-    always@(posedge clk, negedge rst)begin
+    always@(posedge clk)begin
         if (rst)begin
             read_data <= 0;
             SRAM_WE_reg <= 0;
