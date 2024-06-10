@@ -15,6 +15,7 @@ module sram(
     input [17:0] SRAM_ADDR;
     input clk, rst, SRAM_UB_N, SRAM_LB_N, SRAM_WE_N, SRAM_CE_N, SRAM_OE_N;
   
+    wire [15:0] www;
     reg [15:0] memory [0:63];
     reg [15:0] read_data;
     reg SRAM_WE_reg;
@@ -35,15 +36,15 @@ module sram(
         else if(~SRAM_WE_N) begin
         memory[SRAM_ADDR] <= SRAM_DQ;
         end 
-        else if (SRAM_WE_N) begin
-            read_data <= memory[SRAM_ADDR];
-            SRAM_WE_reg <= SRAM_WE_N;
-        end
+        
+        read_data <= memory[SRAM_ADDR];
+        SRAM_WE_reg <= SRAM_WE_N;
         
         
     end
 
 
-assign  SRAM_DQ= SRAM_WE_reg ? read_data : 16'bzzzzzzzzzzzzzzzz;
+assign  SRAM_DQ = (SRAM_WE_reg==1'b1) ? read_data : 16'bzzzzzzzzzzzzzzzz;
+assign  www = (SRAM_WE_reg==1'b1) ? read_data : 16'bzzzzzzzzzzzzzzzz;
 
 endmodule

@@ -16,9 +16,9 @@ module sram_controller(
     );
 
     reg [3:0] ps,ns;
-    parameter [3:0] IDLE = 0, W_LOW = 1, W_HIGH = 2, W_NE = 3, NOP = 4, R_E = 5, R_LOW = 6, R_HIGH = 7, Ready = 8;
+    parameter [3:0] IDLE = 0, W_LOW = 1, W_HIGH = 2, W_NE = 3, NOP = 4, R_E = 5, R_LOW = 6, R_HIGH = 7, Ready = 8,mid=9;
     wire [15:0] d;
-    assign d = SRAM_DQ;
+    
     wire[31:0] address2;
     assign address2=address-32'd1024;
 
@@ -39,17 +39,18 @@ module sram_controller(
         case(ps)
             IDLE : begin
                 if(wr_en)
-                    ns=W_LOW;
+                    ns=mid;
                 if(rd_en)
                     ns=R_E;
             end
-            
+            mid:
+                ns=W_LOW;
             W_LOW : 
                 ns=W_HIGH;
             W_HIGH :
                 ns= W_NE;
             W_NE :
-                ns= NOP;
+                ns= Ready;
             NOP:
                 ns=Ready;
             R_E:
@@ -59,13 +60,13 @@ module sram_controller(
             R_HIGH:
                 ns=NOP;
             Ready:
-            ns=IDLE;
+                ns=IDLE;
         endcase
 
     end
 
     always@(*)begin
-        SRAM_WE_N=1'bz;
+        SRAM_WE_N=1'b1;
         ready=1'b0;
         SRAM_ADDR = 18'b0;
         sram_freeze=1'b0;
@@ -75,6 +76,12 @@ module sram_controller(
             IDLE:begin
                 sram_freeze=rd_en | wr_en;
             end
+            mid:begin
+                SRAM_WE_N=1'b0;
+                SRAM_ADDR={address2[18:2],1'b0};
+                sram_freeze=1'b1;
+            end
+
             W_LOW: begin
                 SRAM_WE_N=1'b0;
                 SRAM_ADDR={address2[18:2],1'b0};
@@ -87,7 +94,7 @@ module sram_controller(
             end
             W_NE:begin
                 sram_freeze=1'b1;
-                
+
                 
             end
             R_E:begin
@@ -120,6 +127,8 @@ module sram_controller(
     assign {SRAM_UB_N,SRAM_LB_N,SRAM_CE_N,SRAM_OE_N} = 4'b0;
     assign SRAM_DQ = (ps == W_LOW) ? write_data[15 : 0] :
                 (ps == W_HIGH) ? write_data[31 : 16] : 16'bzzzzzzzzzzzzzzzz;
+    assign d = (ps == W_LOW) ? write_data[15 : 0] :
+                (ps == W_HIGH) ? write_data[31 : 16] : 16'bzzzzzzzzzzzzzzzz;
 
 
     
@@ -132,9 +141,9 @@ module Reg_Read(input clk, rst, ld1, ld2, inout [15:0] data1, data2, output reg 
         if (rst)
             data_out <= 32'b0;
         else if (ld1)
-            data_out[15:0] = data1;
+            data_out[15:0] <= data1;
         else if (ld2)
-            data_out[31:16] = data2;
+            data_out[31:16] <= data2;
         
     end
 endmodule
