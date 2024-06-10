@@ -7,9 +7,9 @@ module sram_controller(
     input [31:0] write_data,
 
     // to next stage
-    output reg[31:0] read_data,
+    output [31:0] read_data,
     output reg sram_freeze,
-    inout reg [15:0] SRAM_DQ,
+    inout  [15:0] SRAM_DQ,
     output reg [17:0] SRAM_ADDR,
     output reg SRAM_WE_N,ready,
     output  SRAM_UB_N,SRAM_LB_N,SRAM_CE_N,SRAM_OE_N
@@ -21,6 +21,10 @@ module sram_controller(
     assign d = SRAM_DQ;
     wire[31:0] address2;
     assign address2=address-32'd1024;
+
+    reg ld1, ld2;
+
+    Reg_Read RR1(clk, rst, ld1, ld2, SRAM_DQ, SRAM_DQ, read_data);
 
     always @(posedge clk) begin
 		if (rst)
@@ -65,6 +69,8 @@ module sram_controller(
         ready=1'b0;
         SRAM_ADDR = 18'b0;
         sram_freeze=1'b0;
+        ld1=1'b0;
+        ld2=1'b0;
         case(ps)
             IDLE:begin
                 sram_freeze=rd_en | wr_en;
@@ -86,22 +92,25 @@ module sram_controller(
             R_E:begin
                 SRAM_WE_N=1'b1;
                 SRAM_ADDR={address2[18:2],1'b0};
+                
                 sram_freeze=1'b1;
             end
             R_LOW:begin
                 SRAM_ADDR={address2[18:2],1'b1};
-                read_data={16'b0,d};
+                
+                ld1=1'b1;
                 sram_freeze=1'b1;
             end
             NOP:
                 sram_freeze=1'b1;
             R_HIGH:begin
-                read_data[31:16]=d;
+                
                 sram_freeze=1'b1;
+                ld2=1'b1;
             end
             Ready:begin
                 ready=1'b1;
-                sram_freeze=1'b0;
+                
             end
 
         endcase
@@ -111,4 +120,20 @@ module sram_controller(
     assign SRAM_DQ = (ps == W_LOW) ? write_data[15 : 0] :
                 (ps == W_HIGH) ? write_data[31 : 16] : 16'bz;
 
+
+    
+
+endmodule
+
+
+module Reg_Read(input clk, rst, ld1, ld2, inout [15:0] data1, data2, output reg [31:0] data_out);
+    always @(posedge clk, posedge rst) begin
+        if (rst)
+            data_out <= 32'b0;
+        else if (ld1)
+            data_out[15:0] <= data1;
+        else if (ld2)
+            data_out[31:16] <= data2;
+        
+    end
 endmodule

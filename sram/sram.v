@@ -16,8 +16,8 @@ module sram(
     input clk, rst, SRAM_UB_N, SRAM_LB_N, SRAM_WE_N, SRAM_CE_N, SRAM_OE_N;
   
     reg [15:0] memory [0:63];
-
-    //wire [17:0] true_addr=(SRAM_ADDR-18'd1024)>>2;
+    reg [15:0] read_data;
+    reg SRAM_WE_reg;
     integer i;
     always@(posedge rst)
     begin
@@ -27,12 +27,22 @@ module sram(
         end
     end
   
-
-assign SRAM_DQ = SRAM_WE_N ? memory[SRAM_ADDR] : 32'bz;
-
-always@(posedge clk) begin
-    if(~SRAM_WE_N) begin
+    always@(posedge clk, negedge rst)begin
+        if (rst)begin
+            read_data <= 0;
+            SRAM_WE_reg <= 0;
+        end
+        else if(~SRAM_WE_N) begin
         memory[SRAM_ADDR] <= SRAM_DQ;
+        end
+        else begin
+            read_data <= memory[SRAM_ADDR];
+            SRAM_WE_reg <= SRAM_WE_N;
+        end
+        
     end
-end
+
+
+assign SRAM_DQ = SRAM_WE_reg ? read_data : 16'bz;
+
 endmodule

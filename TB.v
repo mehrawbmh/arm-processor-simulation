@@ -139,7 +139,7 @@ ARM_and_Sram AS1(
         CLOCK_50 = 1'b0;
         SW[0] = 1'b1;
         #20 SW[0] = 1'b0;
-        #4000 $stop;
+        #6000 $stop;
 
     end
 
